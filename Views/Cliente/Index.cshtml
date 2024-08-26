@@ -1,0 +1,55 @@
+﻿@model IEnumerable<ClienteModel>
+
+
+<h1>Clientes</h1>
+<p>
+    <a href="#">Novo Cliente</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Sobrenome</th>
+            <th>Email</th>
+            <th>Data de Nascimento</th>
+            <th>Observação</th>
+            <th>Representante</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var cliente in Model)
+        {
+            <tr>
+                <td>
+                    <label>@cliente.ClienteId</label>
+                </td>
+                <td>
+                    <label>@cliente.Nome</label>
+                </td>
+
+                <td>
+                    <label>@cliente.Sobrenome</label>
+                </td>
+                <td>
+                    <label>@cliente.email</label>
+                </td>
+                <td>
+                    <label>@cliente.DataNascimento</label>
+                </td>
+                <td>
+                    <label>@cliente.Representante</label>
+                </td>
+
+                <td>
+                    <a href="#">Editar</a>
+                    <a href="#">Consultar</a>
+                    <a href="#">Excluir</a>
+                </td>
+            </tr>
+        }
+    
+    </tbody>
+        
+
+</table>
