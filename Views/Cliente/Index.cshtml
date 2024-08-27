@@ -1,55 +1,60 @@
-﻿@model IEnumerable<ClienteModel>
-
-
+﻿@model IEnumerable<Fiap.Web.Alunos.Models.ClienteModel>
 <h1>Clientes</h1>
+@if (!string.IsNullOrEmpty((String)TempData["mensagemSucesso"]))
+{
+    <div class="alert alert-warning" role="alert">@TempData["mensagemSucesso"]</div>
+}
 <p>
-    <a href="#">Novo Cliente</a>
+    <a asp-controller="Cliente" asp-action="Create">Novo Cliente</a>
 </p>
+<!-- Código suprimido ... -->
 <table class="table">
     <thead>
         <tr>
+            <th>ID</th>
             <th>Nome</th>
             <th>Sobrenome</th>
             <th>Email</th>
-            <th>Data de Nascimento</th>
-            <th>Observação</th>
+            <th>Nascimento</th>
             <th>Representante</th>
             <th>Ações</th>
         </tr>
     </thead>
     <tbody>
-        @foreach(var cliente in Model)
+        @foreach (var item in Model)
         {
             <tr>
                 <td>
-                    <label>@cliente.ClienteId</label>
+                    <label>@item.ClienteId</label>
                 </td>
                 <td>
-                    <label>@cliente.Nome</label>
-                </td>
-
-                <td>
-                    <label>@cliente.Sobrenome</label>
+                    <label>@item.Nome</label>
                 </td>
                 <td>
-                    <label>@cliente.email</label>
+                    <label>@item.Sobrenome</label>
                 </td>
                 <td>
-                    <label>@cliente.DataNascimento</label>
+                    <label>@item.Email</label>
                 </td>
                 <td>
-                    <label>@cliente.Representante</label>
+                    <label>@item.DataNascimento</label>
                 </td>
-
                 <td>
-                    <a href="#">Editar</a>
-                    <a href="#">Consultar</a>
-                    <a href="#">Excluir</a>
+                    <label>@item.Representante.NomeRepresentante</label>
+                </td>
+                <td>
+                    <!-- asp-route-id é usado para informar o Id do Item selecionado. -->
+                    <a asp-controller="Cliente"
+                       asp-action="Edit"
+                       asp-route-id="@item.ClienteId">Editar</a>
+                    <a asp-controller="Cliente"
+                       asp-action="Detail"
+                       asp-route-id="@item.ClienteId">Consultar</a>
+                    <a asp-controller="Cliente"
+                       asp-action="Delete"
+                       asp-route-id="@item.ClienteId">Excluir</a>
                 </td>
             </tr>
         }
-    
     </tbody>
-        
-
 </table>
