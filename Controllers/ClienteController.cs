@@ -1,88 +1,73 @@
-﻿using Fiap.Web.Alunos.Models;
+﻿using Fiap.Web.Alunos.Data.Contexts;
+using Fiap.Web.Alunos.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering; 
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Linq;
+
 namespace Fiap.Web.Alunos.Controllers
 {
     public class ClienteController : Controller
     {
+        private readonly DatabaseContext _context;
 
-        public IList<ClienteModel> clientes { get; set; }
-
-        public IList<RepresentanteModel> representantes { get; set; }
-        public ClienteController()
+        public ClienteController(DatabaseContext context)
         {
-            //Simula a busca de clientes no banco de dados
-            clientes = GerarClientesMocados();
-            representantes = GerarRepresentantesMocados();
+            _context = context;
         }
+
         public IActionResult Index()
         {
-
-            if (clientes == null)
-            {
-                clientes = new List<ClienteModel>();
-            }
+            // Carrega todos os clientes do banco de dados
+            var clientes = _context.Clientes.ToList();
             return View(clientes);
+
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            Console.WriteLine("Executou a Action Cadastrar()");
-
-            var selectListRepresentantes =
-                new SelectList(representantes,
-                                nameof(RepresentanteModel.RepresentanteId),
-                                nameof(RepresentanteModel.NomeRepresentante));
+            var representantes = _context.RepresentanteModels.ToList();
+            var selectListRepresentantes = new SelectList(representantes, nameof(RepresentanteModel.RepresentanteId), nameof(RepresentanteModel.NomeRepresentante));
 
             ViewBag.Representantes = selectListRepresentantes;
 
             return View(new ClienteModel());
         }
+
         [HttpPost]
         public IActionResult Create(ClienteModel clienteModel)
         {
-            Console.WriteLine("Gravando o cliente");
-            TempData["mensagemSucesso"] = $"O cliente {clienteModel.Nome} foi cadastrado com suceso";
+            _context.Clientes.Add(clienteModel);
+            _context.SaveChanges();
+
+            TempData["mensagemSucesso"] = $"O cliente {clienteModel.Nome} foi cadastrado com sucesso";
             return RedirectToAction(nameof(Index));
         }
 
-        public static List<RepresentanteModel> GerarRepresentantesMocados()
+        [HttpPost]
+        public IActionResult Edit(ClienteModel clienteModel)
         {
-            var representantes = new List<RepresentanteModel>
-            {
-                new RepresentanteModel { RepresentanteId = 1, NomeRepresentante = "Representante 1", CPF = "111.111.111-11" },
-                new RepresentanteModel { RepresentanteId = 2, NomeRepresentante = "Representante 2", CPF = "222.222.222-22" },
-                new RepresentanteModel { RepresentanteId = 3, NomeRepresentante = "Representante 3", CPF = "333.333.333-33" },
-                new RepresentanteModel { RepresentanteId = 4, NomeRepresentante = "Representante 4", CPF = "444.444.444-44" }
-            };
-            return representantes;
+            _context.Update(clienteModel);
+            _context.SaveChanges();
+            TempData["mensagemSucesso"] = $"Os dados do cliente {clienteModel.Nome} foram alterados com sucesso";
+            return RedirectToAction(nameof(Index));
         }
 
-        public static List<ClienteModel> GerarClientesMocados()
+        [HttpGet]
+        public IActionResult Delete(int id)
         {
-            var clientes = new List<ClienteModel>();
-            for (int i = 1; i <= 5; i++)
+            var cliente = _context.Clientes.Find(id);
+            if (cliente != null)
             {
-                var cliente = new ClienteModel
-                {
-                    ClienteId = i,
-                    Nome = "Cliente" + i,
-                    Sobrenome = "Sobrenome" + i,
-                    Email = "cliente" + i + "@example.com",
-                    DataNascimento = DateTime.Now.AddYears(-30),
-                    Observacao = "Observação do cliente " + i,
-                    RepresentanteId = i,
-                    Representante = new RepresentanteModel
-                    {
-                        RepresentanteId = i,
-                        NomeRepresentante = "Representante" + i,
-                        CPF = "00000000191"
-                    }
-                };
-                clientes.Add(cliente);
+                _context.Clientes.Remove(cliente);
+                _context.SaveChanges();
+                TempData["mensagemSucesso"] = $"Os dados do cliente {cliente.Nome} foram removidos com sucesso";
             }
-            return clientes;
+            else
+            {
+                TempData["mensagemSucesso"] = "OPS !!! Cliente inexistente.";
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }
